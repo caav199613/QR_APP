@@ -1,5 +1,6 @@
 package com.example.qr_app.ui.selection
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.qr_app.model.Bus
@@ -11,6 +12,10 @@ import com.example.qr_app.network.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 class SelectionViewModel : ViewModel() {
 
@@ -56,23 +61,37 @@ class SelectionViewModel : ViewModel() {
     }
 
     fun enviarRegistro() {
-        val estudianteId = _estudiante.value?.numero_identificacion
-        val busId = _selectedBus.value?.id
-        val conductorId = _selectedDriver.value?.id
+        val estudianteId = _estudiante.value?.id?.toString()
+        val busId = _selectedBus.value?.id?.toString()
+        val conductorId = _selectedDriver.value?.id?.toString()
 
         if (estudianteId != null && busId != null && conductorId != null) {
             viewModelScope.launch {
                 try {
-                    val response = RetrofitClient.apiService.postRegistro(
-                        RegistroRequest(estudianteId, busId, conductorId)
+                    val fechaIso = Instant.now().atOffset(ZoneOffset.UTC)
+                        .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+
+                    val request = RegistroRequest(
+                        idEstudiante = estudianteId,
+                        idBus = busId,
+                        idConductor = conductorId,
+                        fechaYHora = fechaIso
                     )
+
+                    val response = RetrofitClient.apiService.postRegistro(request)
                     _registroResponse.value = response
+                } catch (e: HttpException) {
+                    Log.e("SelectionVM", "HTTP error ${e.code()}: ${e.response()?.errorBody()?.string()}")
+                    // Mostrar snackbar de error
+                    _registroResponse.value = null // para que Compose lo interprete como fallo
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Log.e("SelectionVM", "Error enviando registro", e)
+                    _registroResponse.value = null
                 }
             }
         }
     }
+
 
     fun clearEstudiante() {
         _estudiante.value = null

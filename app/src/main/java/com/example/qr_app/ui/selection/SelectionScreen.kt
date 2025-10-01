@@ -31,6 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 
 @Composable
 fun SelectionScreen(
@@ -38,6 +41,8 @@ fun SelectionScreen(
     viewModel: SelectionViewModel,
     onScanQr: () -> Unit
 ) {
+    val fechaLocal = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) // "2025-10-01T02:27:44"
+
     val buses by viewModel.buses.collectAsStateWithLifecycle()
     val conductores by viewModel.conductores.collectAsStateWithLifecycle()
     val estudiante by viewModel.estudiante.collectAsStateWithLifecycle()
@@ -55,15 +60,19 @@ fun SelectionScreen(
 
     // Mostrar Snackbar cuando haya respuesta
     LaunchedEffect(registroResponse) {
-        registroResponse?.let { response ->
+        if (registroResponse != null) {
             scope.launch {
-                snackbarHostState.showSnackbar(response.message)
+                snackbarHostState.showSnackbar("Estudiante registrado con éxito")
             }
-            if (response.success) {
-                viewModel.clearEstudiante() // ✅ limpiamos estudiante si éxito
+            viewModel.clearEstudiante()
+        } else {
+            scope.launch {
+                snackbarHostState.showSnackbar("No se pudo registrar el estudiante")
             }
         }
     }
+
+
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }

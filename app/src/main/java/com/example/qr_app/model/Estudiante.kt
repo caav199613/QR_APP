@@ -10,5 +10,6 @@ data class Estudiante(
     val grado: String,
     val codigo_grado: Int,
     val acudiente: String,
-    val numero_acudiente: String
+    val numero_acudiente: String,
+    val id: String
 )

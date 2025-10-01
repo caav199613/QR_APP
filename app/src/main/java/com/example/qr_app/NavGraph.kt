@@ -1,6 +1,7 @@
 package com.example.qr_app
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -9,29 +10,28 @@ import com.example.qr_app.ui.selection.SelectionScreen
 import com.example.qr_app.ui.selection.SelectionViewModel
 
 @Composable
-fun NavGraph(
-    navController: NavHostController,
-    selectionViewModel: SelectionViewModel
-) {
-    NavHost(navController = navController, startDestination = "selection") {
+fun NavGraph(navController: NavHostController, selectionViewModel: SelectionViewModel) {
+    val selectionViewModel: SelectionViewModel = viewModel() // mismo owner, por ejemplo en Activity/NavHost
+
+    NavHost(navController, startDestination = "selection") {
         composable("selection") {
             SelectionScreen(
                 navController = navController,
                 viewModel = selectionViewModel,
-                onScanQr = { navController.navigate("qr_scanner") }
+                onScanQr = { navController.navigate("qrScanner") }
             )
         }
-        composable("qr_scanner") {
+
+        composable("qrScanner") {
             QrScannerScreen(
                 navController = navController,
-                viewModel = selectionViewModel,
+                viewModel = selectionViewModel, // <-- REUTILIZAS LA MISMA INSTANCIA
                 onBack = { navController.popBackStack() },
                 onResult = { estudiante ->
-                    // Guardar estudiante en ViewModel
-                    selectionViewModel.setEstudiante(estudiante)
-                    navController.popBackStack()
+                    // opcional: aquí también puedes manejar algo si quieres
                 }
             )
         }
     }
+
 }
