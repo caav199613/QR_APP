@@ -62,16 +62,16 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
 
-    // --- CameraX ---
-    val cameraxVersion = "1.3.4"
-    implementation("androidx.camera:camera-core:$cameraxVersion")
-    implementation("androidx.camera:camera-camera2:$cameraxVersion")
-    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
-    implementation("androidx.camera:camera-view:$cameraxVersion")
-    implementation("androidx.camera:camera-mlkit-vision:$cameraxVersion")
 
-    // --- ML Kit Barcode (para QR) ---
-    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+    // CameraX core
+    implementation ("androidx.camera:camera-core:1.3.4")
+    implementation ("androidx.camera:camera-camera2:1.3.4")
+    implementation ("androidx.camera:camera-lifecycle:1.3.4")
+    implementation ("androidx.camera:camera-view:1.3.4")
+
+    // ML Kit Vision + CameraX integration
+    implementation ("androidx.camera:camera-mlkit-vision:1.4.0-alpha04") // usa esta
+    implementation ("com.google.mlkit:barcode-scanning:17.2.0")
 
     // --- Testing ---
     testImplementation(libs.junit)
