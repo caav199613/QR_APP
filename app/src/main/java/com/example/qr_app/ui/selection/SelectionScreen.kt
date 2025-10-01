@@ -41,7 +41,7 @@ fun SelectionScreen(
     val buses by viewModel.buses.collectAsStateWithLifecycle()
     val conductores by viewModel.conductores.collectAsStateWithLifecycle()
     val estudiante by viewModel.estudiante.collectAsStateWithLifecycle()
-    val registroResponse by viewModel.registroResponse.collectAsStateWithLifecycle()
+    val registroResponse by viewModel.registroResponse.collectAsStateWithLifecycle(initialValue = null)
 
     val selectedBus by viewModel.selectedBus.collectAsStateWithLifecycle()
     val selectedDriver by viewModel.selectedDriver.collectAsStateWithLifecycle()

@@ -1,7 +1,6 @@
 package com.example.qr_app
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -10,15 +9,16 @@ import com.example.qr_app.ui.selection.SelectionScreen
 import com.example.qr_app.ui.selection.SelectionViewModel
 
 @Composable
-fun NavGraph(navController: NavHostController) {
-    val selectionViewModel: SelectionViewModel = viewModel()
-
+fun NavGraph(
+    navController: NavHostController,
+    selectionViewModel: SelectionViewModel
+) {
     NavHost(navController = navController, startDestination = "selection") {
         composable("selection") {
             SelectionScreen(
                 navController = navController,
-                onScanQr = { navController.navigate("qr_scanner") },
-                viewModel = TODO()
+                viewModel = selectionViewModel,
+                onScanQr = { navController.navigate("qr_scanner") }
             )
         }
         composable("qr_scanner") {

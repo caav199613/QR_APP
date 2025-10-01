@@ -75,6 +75,7 @@ dependencies {
     // Lifecycle & ViewModel para Compose
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
 
     // CameraX core
     implementation("androidx.camera:camera-core:1.3.4")

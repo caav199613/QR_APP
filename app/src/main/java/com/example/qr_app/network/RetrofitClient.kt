@@ -1,5 +1,6 @@
 package com.example.qr_app.network
 
+import ApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
