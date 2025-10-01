@@ -8,9 +8,10 @@ import com.example.qr_app.ui.theme.BusAppTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        actionBar?.hide() // opcional
         setContent {
             BusAppTheme {
-                NavGraph(navController = rememberNavController())
+                // Aquí va tu NavHost o la pantalla principal
             }
         }
     }

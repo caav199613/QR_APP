@@ -1,7 +1,10 @@
-<!-- res/values/themes.xml -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.QrApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Lo mínimo necesario -->
-    </style>
-</resources>
 
+    <!-- Tema Light base para Material3 -->
+    <style name="Theme.QRApp" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Status bar y navbar -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+
+</resources>
