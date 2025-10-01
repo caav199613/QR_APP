@@ -1,6 +1,5 @@
 package com.example.qr_app.ui.selection
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.qr_app.model.Bus
@@ -19,6 +18,13 @@ import java.time.format.DateTimeFormatter
 
 class SelectionViewModel : ViewModel() {
 
+    sealed class RegistroState {
+        object Idle : RegistroState()
+        object Loading : RegistroState()
+        data class Success(val response: RegistroResponse) : RegistroState()
+        data class Error(val message: String) : RegistroState()
+    }
+
     private val _selectedDriver = MutableStateFlow<Conductor?>(null)
     val selectedDriver: StateFlow<Conductor?> = _selectedDriver
 
@@ -36,6 +42,9 @@ class SelectionViewModel : ViewModel() {
 
     private val _registroResponse = MutableStateFlow<RegistroResponse?>(null)
     val registroResponse: StateFlow<RegistroResponse?> = _registroResponse
+
+    private val _registroState = MutableStateFlow<RegistroState>(RegistroState.Idle)
+    val registroState: StateFlow<RegistroState> = _registroState
 
     fun selectDriver(driver: Conductor) {
         _selectedDriver.value = driver
@@ -61,12 +70,13 @@ class SelectionViewModel : ViewModel() {
     }
 
     fun enviarRegistro() {
-        val estudianteId = _estudiante.value?.id?.toString()
-        val busId = _selectedBus.value?.id?.toString()
-        val conductorId = _selectedDriver.value?.id?.toString()
+        val estudianteId = _estudiante.value?.id
+        val busId = _selectedBus.value?.id
+        val conductorId = _selectedDriver.value?.id
 
         if (estudianteId != null && busId != null && conductorId != null) {
             viewModelScope.launch {
+                _registroState.value = RegistroState.Loading
                 try {
                     val fechaIso = Instant.now().atOffset(ZoneOffset.UTC)
                         .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
@@ -79,14 +89,13 @@ class SelectionViewModel : ViewModel() {
                     )
 
                     val response = RetrofitClient.apiService.postRegistro(request)
-                    _registroResponse.value = response
+                    _registroState.value = RegistroState.Success(response)
+                    _estudiante.value = null
                 } catch (e: HttpException) {
-                    Log.e("SelectionVM", "HTTP error ${e.code()}: ${e.response()?.errorBody()?.string()}")
-                    // Mostrar snackbar de error
-                    _registroResponse.value = null // para que Compose lo interprete como fallo
+                    val errBody = e.response()?.errorBody()?.string()
+                    _registroState.value = RegistroState.Error("No se pudo registrar el estudiante: ${errBody ?: e.message()}")
                 } catch (e: Exception) {
-                    Log.e("SelectionVM", "Error enviando registro", e)
-                    _registroResponse.value = null
+                    _registroState.value = RegistroState.Error("No se pudo registrar el estudiante: ${e.message}")
                 }
             }
         }

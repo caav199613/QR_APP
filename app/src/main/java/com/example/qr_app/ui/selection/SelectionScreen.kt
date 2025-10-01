@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.qr_app.ui.selection.SelectionViewModel.RegistroState
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -47,6 +48,7 @@ fun SelectionScreen(
     val conductores by viewModel.conductores.collectAsStateWithLifecycle()
     val estudiante by viewModel.estudiante.collectAsStateWithLifecycle()
     val registroResponse by viewModel.registroResponse.collectAsStateWithLifecycle(initialValue = null)
+    val registroState by viewModel.registroState.collectAsStateWithLifecycle()
 
     val selectedBus by viewModel.selectedBus.collectAsStateWithLifecycle()
     val selectedDriver by viewModel.selectedDriver.collectAsStateWithLifecycle()
@@ -59,19 +61,21 @@ fun SelectionScreen(
     }
 
     // Mostrar Snackbar cuando haya respuesta
-    LaunchedEffect(registroResponse) {
-        if (registroResponse != null) {
-            scope.launch {
-                snackbarHostState.showSnackbar("Estudiante registrado con éxito")
+    LaunchedEffect(registroState) {
+        when (registroState) {
+            is RegistroState.Success -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Estudiante registrado con éxito ✅")
+                }
             }
-            viewModel.clearEstudiante()
-        } else {
-            scope.launch {
-                snackbarHostState.showSnackbar("No se pudo registrar el estudiante")
+            is RegistroState.Error -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar((registroState as RegistroState.Error).message)
+                }
             }
+            else -> {} // No hacemos nada si Idle o Loading
         }
     }
-
 
 
     Scaffold(
@@ -144,10 +148,12 @@ fun SelectionScreen(
             // Botón Enviar Registro
             Button(
                 onClick = { viewModel.enviarRegistro() },
-                enabled = estudiante != null && selectedDriver != null && selectedBus != null,
+                enabled = estudiante != null && selectedDriver != null && selectedBus != null && registroState !is RegistroState.Loading,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Enviar Registro")
+                Text(
+                    text = if (registroState is RegistroState.Loading) "Enviando..." else "Enviar Registro"
+                )
             }
         }
     }
